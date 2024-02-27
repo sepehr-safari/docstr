@@ -1,6 +1,7 @@
 import { MainLayout } from '@/shared/components/main-layout';
 
 import { BackButton } from '@/features/back-button';
+import { ExploreDocsList } from '@/features/docs-list';
 
 export const ExplorePage = () => {
   return (
@@ -13,7 +14,7 @@ export const ExplorePage = () => {
           </>
         }
       >
-        <div>Explore Docs</div>
+        <ExploreDocsList />
       </MainLayout>
     </>
   );

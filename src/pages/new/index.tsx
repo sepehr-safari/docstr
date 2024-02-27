@@ -9,10 +9,12 @@ import { Markdown } from '@/features/markdown';
 import { MainLayout } from '@/shared/components/main-layout';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { useToast } from '@/shared/components/ui/use-toast';
 
 import { useLoginGuard } from '@/shared/hooks/use-login-guard';
 import { useMe } from '@/shared/hooks/use-me';
-import { useToast } from '@/shared/components/ui/use-toast';
+
+import { DOC_KIND } from '@/shared/config';
 
 export const NewPage = () => {
   const markdownRef = useRef<MDXEditorMethods>(null);
@@ -54,7 +56,7 @@ export const NewPage = () => {
                 const markdown = markdownRef.current?.getMarkdown();
 
                 const e = createNewEvent();
-                e.kind = 30023;
+                e.kind = DOC_KIND;
                 e.content = markdown || '';
                 e.tags = [
                   ['title', title],
@@ -82,7 +84,7 @@ export const NewPage = () => {
         <Markdown markdownRef={markdownRef} />
 
         <Input
-          placeholder="Delegatee Pubkey"
+          placeholder="Delegatee Pubkey (you can change this later)"
           className="mt-4"
           value={delegateeInput}
           onChange={(e) => setDelegateeInput(e.target.value)}

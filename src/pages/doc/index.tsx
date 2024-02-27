@@ -6,6 +6,7 @@ import { Input } from '@/shared/components/ui/input';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Muted } from '@/shared/components/ui/typography/muted';
 import { useToast } from '@/shared/components/ui/use-toast';
+import { DOC_KIND } from '@/shared/config';
 import { useMe } from '@/shared/hooks/use-me';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { Loader2 } from 'lucide-react';
@@ -89,13 +90,26 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
           <>
             <BackButton />
 
-            <span>
-              {isMyDocument
-                ? 'Edit your document'
-                : isDelegatedToMe
-                  ? 'Edit delegated document'
-                  : title}
-            </span>
+            <div>
+              <p>
+                {isMyDocument
+                  ? 'Edit your document'
+                  : isDelegatedToMe
+                    ? 'Edit delegated document'
+                    : title}
+              </p>
+
+              <p className="mt-2 text-muted-foreground text-xs">
+                Owner:{' '}
+                {originalEvents[0]?.pubkey.slice(0, 5) +
+                  '...' +
+                  originalEvents[0]?.pubkey.slice(-5)}
+              </p>
+              <p className="mt-2 text-muted-foreground text-xs">
+                Last edit by:{' '}
+                {mostRecentEvent?.pubkey.slice(0, 5) + '...' + mostRecentEvent?.pubkey.slice(-5)}
+              </p>
+            </div>
 
             {editMode && (
               <Button
@@ -104,7 +118,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                   const markdown = markdownRef.current?.getMarkdown();
 
                   const e = createNewEvent();
-                  e.kind = 30023;
+                  e.kind = DOC_KIND;
                   e.content = markdown || '';
                   e.generateTags();
                   e.tags = [
@@ -152,7 +166,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
 
         {isMyDocument && (
           <Input
-            placeholder="Delegatee Pubkey"
+            placeholder="Delegatee Pubkey (you can change this later)"
             className="mt-4"
             value={delegateeInput}
             onChange={(e) => setDelegateeInput(e.target.value)}

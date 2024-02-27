@@ -15,6 +15,7 @@ export default defineConfig({
         manualChunks: {
           'react-stuff': ['react', 'react-dom', 'react-router-dom'],
           'nostr-dev-kit': ['@nostr-dev-kit/ndk', '@nostr-dev-kit/ndk-cache-dexie'],
+          mdxeditor: ['@mdxeditor/editor'],
           zustand: ['zustand'],
         },
       },

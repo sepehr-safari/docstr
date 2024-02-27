@@ -1,19 +1,22 @@
-import { BackButton } from '@/features/back-button';
-import { Markdown } from '@/features/markdown';
-import { MainLayout } from '@/shared/components/main-layout';
-import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
-import { Skeleton } from '@/shared/components/ui/skeleton';
-import { Muted } from '@/shared/components/ui/typography/muted';
-import { useToast } from '@/shared/components/ui/use-toast';
-import { DOC_KIND } from '@/shared/config';
-import { useMe } from '@/shared/hooks/use-me';
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { Loader2 } from 'lucide-react';
 import { useNewEvent, useSubscribe } from 'nostr-hooks';
 import { nip19 } from 'nostr-tools';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+import { MainLayout } from '@/shared/components/main-layout';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Muted } from '@/shared/components/ui/typography/muted';
+import { useToast } from '@/shared/components/ui/use-toast';
+
+import { BackButton } from '@/features/back-button';
+import { Markdown } from '@/features/markdown';
+
+import { useMe } from '@/shared/hooks/use-me';
+
+import { DOC_KIND } from '@/shared/config';
 
 const View = ({ data }: { data: nip19.AddressPointer }) => {
   const [titleInput, setTitleInput] = useState('');
@@ -175,7 +178,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
 
         {isDelegatedToMe && (
           <div className="mt-4">
-            <Muted>This document is delegated to you by {originalEvents[0]?.pubkey}.</Muted>
+            <Muted>This document is delegated to you by the owner</Muted>
           </div>
         )}
       </MainLayout>

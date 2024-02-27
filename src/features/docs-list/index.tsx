@@ -115,7 +115,9 @@ export const ExploreDocsList = () => {
     enabled: true,
   });
 
-  const filteredEvents = events.filter((event) => event.tags.some(([k]) => k == 'D'));
+  const filteredEvents = events.filter((event) =>
+    event.tags.some(([k, , delegator]) => k == 'D' && event.pubkey == delegator),
+  );
 
   if (filteredEvents.length == 0 && !eose) {
     return (

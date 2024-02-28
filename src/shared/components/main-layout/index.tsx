@@ -19,11 +19,11 @@ export const MainLayout = ({
 
           <Separator />
 
-          <CardContent className="mt-6">{children}</CardContent>
+          <CardContent className="pt-4 overflow-y-auto max-h-96">{children}</CardContent>
 
           <Separator />
 
-          <CardFooter className="mt-6 flex items-center justify-between">
+          <CardFooter className="pt-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500">
                 Made with <span className="text-red-500">💜</span> by Sepehr

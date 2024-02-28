@@ -37,7 +37,7 @@ export const DocListItem = ({ originalEvent }: { originalEvent: NDKEvent }) => {
 
   const title = mostRecentEvent.tagValue('title');
 
-  if (isSubscribed && !delegateeEose) return <Skeleton className="w-1/2 h-5" />;
+  if (isSubscribed && !delegateeEose && !delegateeEvents) return <Skeleton className="w-1/2 h-5" />;
 
   return (
     <div>

@@ -74,7 +74,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
     markdownRef.current?.setMarkdown(content || '');
   }, [title, content, setTitleInput, delegatee, setDelegateeInput]);
 
-  if (!originalEose || (isDelegateeSubscribed && !delegateeEose)) {
+  if (!originalEose || (isDelegateeSubscribed && !delegateeEose && !delegateeEvents)) {
     return (
       <div className="flex justify-center items-center h-full">
         <Loader2 className="animate-spin w-16 h-16" />

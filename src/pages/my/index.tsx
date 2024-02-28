@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { MainLayout } from '@/shared/components/main-layout';
 import { Button } from '@/shared/components/ui/button';
-import { Separator } from '@/shared/components/ui/separator';
 
 import { BackButton } from '@/features/back-button';
 import { MyDocs } from '@/features/my-docs';
@@ -35,8 +34,6 @@ export const MyPage = () => {
           </>
         }
       >
-        <Separator className="my-4" />
-
         <MyDocs publicKey={activeUser?.pubkey} />
       </MainLayout>
     </>

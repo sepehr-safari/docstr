@@ -22,8 +22,6 @@ import { RefObject } from 'react';
 
 import { useTheme } from '@/shared/components/theme-provider';
 
-import { cn } from '@/shared/utils';
-
 import '@mdxeditor/editor/style.css';
 
 const plugins = {
@@ -71,7 +69,7 @@ export const Markdown = ({
       <MDXEditor
         ref={markdownRef}
         readOnly={readonly}
-        className={cn('border rounded-md', theme === 'dark' && 'dark-theme dark-editor')}
+        className={theme === 'dark' ? 'dark-theme dark-editor' : ''}
         markdown={markdown}
         plugins={
           hideToolbar ? plugins.rest(markdown) : [plugins.toolbar, ...plugins.rest(markdown)]

@@ -1,5 +1,5 @@
 import { MDXEditorMethods } from '@mdxeditor/editor';
-import { useNewEvent } from 'nostr-hooks';
+import { useActiveUser, useNewEvent, useNip07 } from 'nostr-hooks';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,25 +11,21 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { useToast } from '@/shared/components/ui/use-toast';
 
-import { useLoginGuard } from '@/shared/hooks/use-login-guard';
-import { useMe } from '@/shared/hooks/use-me';
-
 import { DOC_KIND } from '@/shared/config';
 
 export const NewPage = () => {
   const markdownRef = useRef<MDXEditorMethods>(null);
+
   const [delegateeInput, setDelegateeInput] = useState('');
   const [title, setTitle] = useState('');
 
-  const { me } = useMe();
+  useNip07();
+  const { createNewEvent } = useNewEvent();
+  const { activeUser } = useActiveUser();
 
   const { toast } = useToast();
 
-  const { createNewEvent } = useNewEvent();
-
   const navigate = useNavigate();
-
-  useLoginGuard();
 
   return (
     <>
@@ -43,8 +39,8 @@ export const NewPage = () => {
             <Button
               className="ml-auto"
               onClick={() => {
-                if (!me) {
-                  toast({ title: 'Error' });
+                if (!activeUser) {
+                  toast({ title: 'You need to be logged in to create a document' });
                   return;
                 }
 
@@ -60,7 +56,7 @@ export const NewPage = () => {
                 e.content = markdown || '';
                 e.tags = [
                   ['title', title],
-                  ['D', delegateeInput, me.pubkey],
+                  ['D', delegateeInput, activeUser.pubkey],
                 ];
                 e.generateTags();
                 e.publish().then(() => {

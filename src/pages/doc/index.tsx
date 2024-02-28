@@ -1,6 +1,6 @@
 import { MDXEditorMethods } from '@mdxeditor/editor';
 import { Loader2 } from 'lucide-react';
-import { useNewEvent, useSubscribe } from 'nostr-hooks';
+import { useActiveUser, useNewEvent, useSubscribe } from 'nostr-hooks';
 import { nip19 } from 'nostr-tools';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -14,8 +14,6 @@ import { useToast } from '@/shared/components/ui/use-toast';
 import { BackButton } from '@/features/back-button';
 import { Markdown } from '@/features/markdown';
 
-import { useMe } from '@/shared/hooks/use-me';
-
 import { DOC_KIND } from '@/shared/config';
 
 const View = ({ data }: { data: nip19.AddressPointer }) => {
@@ -23,7 +21,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
   const [delegateeInput, setDelegateeInput] = useState('');
   const markdownRef = useRef<MDXEditorMethods>(null);
 
-  const { me } = useMe();
+  const { activeUser } = useActiveUser();
 
   const { toast } = useToast();
 
@@ -35,11 +33,12 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
     filters: [{ kinds: [kind], '#d': [identifier], authors: [pubkey] }],
     enabled: !!identifier && !!kind && !!pubkey,
   });
-  const isMyDocument = originalEvents.length > 0 && me && originalEvents[0].pubkey === me.pubkey;
+  const isMyDocument =
+    originalEvents.length > 0 && activeUser && originalEvents[0].pubkey === activeUser.pubkey;
   const isDelegatedToMe =
     originalEvents.length > 0 &&
-    me &&
-    originalEvents[0].tags.some(([k, delegatee]) => k == 'D' && delegatee == me.pubkey);
+    activeUser &&
+    originalEvents[0].tags.some(([k, delegatee]) => k == 'D' && delegatee == activeUser.pubkey);
   const editMode = isMyDocument || isDelegatedToMe;
 
   const [, delegatee] = originalEvents[0]?.tags.find(([k]) => k == 'D') || [];
@@ -130,7 +129,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                   ];
 
                   if (isMyDocument) {
-                    e.tags.push(['D', delegateeInput, me.pubkey]); // delegatee, delegator
+                    e.tags.push(['D', delegateeInput, activeUser.pubkey]); // delegatee, delegator
                   }
 
                   if (isDelegatedToMe) {

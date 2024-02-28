@@ -1,3 +1,4 @@
+import { useActiveUser, useNip07 } from 'nostr-hooks';
 import { useNavigate } from 'react-router-dom';
 
 import { MainLayout } from '@/shared/components/main-layout';
@@ -7,15 +8,11 @@ import { Separator } from '@/shared/components/ui/separator';
 import { BackButton } from '@/features/back-button';
 import { MyDocs } from '@/features/my-docs';
 
-import { useLoginGuard } from '@/shared/hooks/use-login-guard';
-import { useMe } from '@/shared/hooks/use-me';
-
 export const MyPage = () => {
-  const { me } = useMe();
+  useNip07();
+  const { activeUser } = useActiveUser();
 
   const navigate = useNavigate();
-
-  useLoginGuard();
 
   return (
     <>
@@ -40,7 +37,7 @@ export const MyPage = () => {
       >
         <Separator className="my-4" />
 
-        <MyDocs publicKey={me?.pubkey} />
+        <MyDocs publicKey={activeUser?.pubkey} />
       </MainLayout>
     </>
   );

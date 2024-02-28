@@ -129,7 +129,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                     ['d', mostRecentEvent?.dTag || ''],
                   ];
 
-                  if (isMyDocument && delegateeInput) {
+                  if (isMyDocument) {
                     e.tags.push(['D', delegateeInput, me.pubkey]); // delegatee, delegator
                   }
 

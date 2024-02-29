@@ -40,7 +40,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
   const { identifier, kind, pubkey } = data;
 
   const { events: originalEvents, eose: originalEose } = useSubscribe({
-    filters: [{ kinds: [kind], '#d': [identifier], authors: [pubkey] }],
+    filters: [{ kinds: [kind], '#d': [identifier], authors: [pubkey], limit: 1 }],
     enabled: !!identifier && !!kind && !!pubkey,
   });
   const isMyDocument =
@@ -58,7 +58,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
     eose: delegateeEose,
     isSubscribed: isDelegateeSubscribed,
   } = useSubscribe({
-    filters: [{ kinds: [kind], '#d': [identifier], authors: [delegatee] }],
+    filters: [{ kinds: [kind], '#d': [identifier], authors: [delegatee], limit: 1 }],
     enabled: !!identifier && !!kind && !!delegatee,
   });
 

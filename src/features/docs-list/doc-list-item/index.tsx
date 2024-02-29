@@ -18,6 +18,7 @@ export const DocListItem = ({ originalEvent }: { originalEvent: NDKEvent }) => {
         kinds: [originalEvent.kind || DOC_KIND],
         '#d': [originalEvent.dTag || ''],
         authors: [delegatee],
+        limit: 1,
       },
     ],
     enabled: !!originalEvent.dTag && !!originalEvent.kind && !!delegatee,

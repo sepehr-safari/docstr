@@ -12,7 +12,7 @@ export const BackButton = () => {
         size="icon"
         variant="ghost"
         onClick={() => {
-          navigate(-1);
+          window.history.length > 2 ? navigate(-1) : navigate('/');
         }}
       >
         <ArrowLeftIcon size={16} />

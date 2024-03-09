@@ -1,5 +1,5 @@
 import { MDXEditorMethods } from '@mdxeditor/editor';
-import { NDKUserProfile } from '@nostr-dev-kit/ndk';
+import { NDKEvent, NDKUserProfile } from '@nostr-dev-kit/ndk';
 import { Loader2, Trash2Icon } from 'lucide-react';
 import { useActiveUser, useNdk, useNewEvent, useNip07, useSubscribe } from 'nostr-hooks';
 import { nip19 } from 'nostr-tools';
@@ -28,6 +28,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
   const [delegateeUser, setDelegateeUser] = useState<NDKUserProfile | null>();
   const [owner, setOwner] = useState<NDKUserProfile | null>();
   const [lastEditor, setLastEditor] = useState<NDKUserProfile | null>();
+  const [mostRecentEvent, setMostRecentEvent] = useState<NDKEvent | undefined>(undefined);
   const markdownRef = useRef<MDXEditorMethods>(null);
 
   useNip07();
@@ -61,18 +62,6 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
     filters: [{ kinds: [kind], '#d': [identifier], authors: [delegatee], limit: 1 }],
     enabled: !!identifier && !!kind && !!delegatee,
   });
-
-  let mostRecentEvent = originalEvents.length > 0 ? originalEvents[0] : undefined;
-
-  if (
-    delegateeEvents.length > 0 &&
-    delegateeEvents[0].created_at &&
-    mostRecentEvent &&
-    mostRecentEvent.created_at &&
-    delegateeEvents[0].created_at > mostRecentEvent.created_at
-  ) {
-    mostRecentEvent = delegateeEvents[0];
-  }
 
   const title = mostRecentEvent?.tagValue('title');
   const content = mostRecentEvent?.content;
@@ -117,6 +106,26 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
       });
     }
   }, [originalEvents]);
+
+  useEffect(() => {
+    setMostRecentEvent((prev) => {
+      if (prev) {
+        if (delegateeEvents.length == 0) return prev;
+        if (!delegateeEvents[0].created_at) return prev;
+        if (!prev.created_at) return prev;
+
+        if (delegateeEvents[0].created_at < prev.created_at) {
+          return prev;
+        } else {
+          return delegateeEvents[0];
+        }
+      } else {
+        if (originalEvents.length == 0) return undefined;
+
+        return originalEvents[0];
+      }
+    });
+  }, [setMostRecentEvent, originalEvents, delegateeEvents]);
 
   useEffect(() => {
     if (mostRecentEvent) {

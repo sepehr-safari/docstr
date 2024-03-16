@@ -1,7 +1,6 @@
 import { useActiveUser, useNip07 } from 'nostr-hooks';
 import { useNavigate } from 'react-router-dom';
 
-import { MainLayout } from '@/shared/components/main-layout';
 import { Button } from '@/shared/components/ui/button';
 
 import { BackButton } from '@/features/back-button';
@@ -15,27 +14,25 @@ export const MyPage = () => {
 
   return (
     <>
-      <MainLayout
-        title={
-          <>
-            <BackButton />
+      <div className="mb-4 flex gap-4 items-center">
+        <BackButton />
 
-            <span>My Docs</span>
+        <span>My Docs</span>
 
-            <Button
-              size="sm"
-              className="ml-auto"
-              onClick={() => {
-                navigate('/new');
-              }}
-            >
-              New Document
-            </Button>
-          </>
-        }
-      >
+        <Button
+          size="sm"
+          className="ml-auto"
+          onClick={() => {
+            navigate('/new');
+          }}
+        >
+          New Document
+        </Button>
+      </div>
+
+      <div>
         <MyDocs publicKey={activeUser?.pubkey} />
-      </MainLayout>
+      </div>
     </>
   );
 };

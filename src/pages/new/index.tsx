@@ -86,7 +86,7 @@ export const NewPage = () => {
 
   return (
     <>
-      <>
+      <div className="mb-4 flex gap-4 items-center">
         <BackButton />
 
         <div>
@@ -100,7 +100,7 @@ export const NewPage = () => {
             <span className="text-lg">⌘</span>P
           </kbd>
         </Button>
-      </>
+      </div>
 
       <Card className="mb-8 pt-6">
         <CardContent className="flex items-center gap-4">

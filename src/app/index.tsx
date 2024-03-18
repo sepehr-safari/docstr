@@ -3,7 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 
 import './index.css';
 
-import { router } from '@/pages';
+import { router } from './router';
 
 import { ThemeProvider } from '@/shared/components/theme-provider';
 import { Toaster } from '@/shared/components/ui/toaster';

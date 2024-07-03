@@ -1,4 +1,4 @@
-import { UserAvatar } from '@/features/user-avatar';
+import { ActiveUserAvatar } from '@/features/active-user-avatar';
 
 import { Footer } from '@/shared/components/footer';
 import { Navbar } from '@/shared/components/navbar';
@@ -7,10 +7,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <Navbar>
-        <UserAvatar />
+        <ActiveUserAvatar />
       </Navbar>
 
-      <div className="px-6 pt-24 pb-12 h-full mx-auto max-w-screen-lg">{children}</div>
+      <div className="pt-16 pb-12">{children}</div>
 
       <Footer />
     </>

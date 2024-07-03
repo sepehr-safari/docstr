@@ -20,8 +20,6 @@ import {
 } from '@mdxeditor/editor';
 import { RefObject } from 'react';
 
-import { cn } from '@/shared/utils';
-
 import { useTheme } from '@/shared/components/theme-provider';
 
 import '@mdxeditor/editor/style.css';

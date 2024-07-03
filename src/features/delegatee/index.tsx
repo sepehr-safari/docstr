@@ -2,6 +2,8 @@ import { NDKUser } from '@nostr-dev-kit/ndk';
 import { useSubscribe } from 'nostr-hooks';
 import { useEffect, useState } from 'react';
 
+import { loader } from '@/shared/utils';
+
 import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -53,7 +55,10 @@ const SearchResults = ({
               onClick={() => handleSelect(user.pubkey)}
             >
               <Avatar>
-                <AvatarImage src={user.profile?.image || ''} alt={user.profile?.name || 'avatar'} />
+                <AvatarImage
+                  src={loader(user.profile?.image || '')}
+                  alt={user.profile?.name || 'avatar'}
+                />
               </Avatar>
 
               <div className="ml-2 truncate w-40">

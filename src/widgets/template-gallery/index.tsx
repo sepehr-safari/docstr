@@ -1,11 +1,14 @@
 import { CaretSortIcon } from '@radix-ui/react-icons';
+import { useWindowSize } from '@uidotdev/usehooks';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Button } from '@/shared/components/ui/button';
 import { H4 } from '@/shared/components/ui/typography/h4';
-import { Preview } from '@/features/preview';
-import { useWindowSize } from '@uidotdev/usehooks';
-import { useState } from 'react';
 
+import { Preview } from '@/features/preview';
+
+// TODO: Replace with real templates
 const items = [1, 2, 3, 4, 5, 6];
 
 const displayCountBasedOnWidth = (width: number | null) => {
@@ -42,17 +45,18 @@ export const TemplateGallery = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {items.slice(0, state ? 5 : displayCountBasedOnWidth(width)).map((item) => (
-            <Preview
-              key={item}
-              content=""
-              footer={
-                <>
-                  <p className="text-sm font-semibold truncate">Blank document</p>
-                  <p className="text-xs font-extralight truncate">Blank document</p>
-                </>
-              }
-            />
+          {items.slice(0, state ? 6 : displayCountBasedOnWidth(width)).map((item) => (
+            <Link to={'/new'} key={item}>
+              <Preview
+                footerHeightFactor={0.2}
+                content=""
+                footer={
+                  <>
+                    <p className="text-sm font-semibold truncate">Blank document</p>
+                  </>
+                }
+              />
+            </Link>
           ))}
         </div>
       </div>

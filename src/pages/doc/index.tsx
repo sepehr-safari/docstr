@@ -1,10 +1,14 @@
-import { MDXEditorMethods } from '@mdxeditor/editor';
-import { NDKEvent, NDKUserProfile } from '@nostr-dev-kit/ndk';
+import { formatRelative } from 'date-fns';
 import { Loader2, Trash2Icon } from 'lucide-react';
-import { useActiveUser, useNdk, useNewEvent, useNip07, useSubscribe } from 'nostr-hooks';
-import { nip19 } from 'nostr-tools';
-import { useEffect, useRef, useState } from 'react';
+import { useNip07 } from 'nostr-hooks';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+import { NOSTR_ICON_URL } from '@/shared/config';
+
+import { loader } from '@/shared/utils';
+
+import { useDocument } from '@/shared/hooks/use-document';
 
 import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
@@ -13,165 +17,66 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/shared/componen
 import { Input } from '@/shared/components/ui/input';
 import { Skeleton } from '@/shared/components/ui/skeleton';
 import { Muted } from '@/shared/components/ui/typography/muted';
-import { useToast } from '@/shared/components/ui/use-toast';
 
 import { BackButton } from '@/features/back-button';
 import { Delegatee } from '@/features/delegatee';
 import { Markdown } from '@/features/markdown';
 
-import { DOC_KIND } from '@/shared/config';
-
-const View = ({ data }: { data: nip19.AddressPointer }) => {
+export const DocPage = () => {
   const [titleInput, setTitleInput] = useState('');
-  const [delegateeState, setDelegateeState] = useState('');
-  const [delegateeUser, setDelegateeUser] = useState<NDKUserProfile | null>();
-  const [owner, setOwner] = useState<NDKUserProfile | null>();
-  const [lastEditor, setLastEditor] = useState<NDKUserProfile | null>();
-  const [mostRecentEvent, setMostRecentEvent] = useState<NDKEvent | undefined>(undefined);
-  const markdownRef = useRef<MDXEditorMethods>(null);
+
+  const { naddr } = useParams();
 
   useNip07();
-  const { createNewEvent } = useNewEvent();
-  const { activeUser } = useActiveUser();
-  const { ndk } = useNdk();
-
-  const { toast } = useToast();
-
-  const { identifier, kind, pubkey } = data;
-
-  const { events: originalEvents, eose: originalEose } = useSubscribe({
-    filters: [{ kinds: [kind], '#d': [identifier], authors: [pubkey], limit: 1 }],
-    enabled: !!identifier && !!kind && !!pubkey,
-  });
-  const isMyDocument =
-    originalEvents.length > 0 && activeUser && originalEvents[0].pubkey === activeUser.pubkey;
-  const isDelegatedToMe =
-    originalEvents.length > 0 &&
-    activeUser &&
-    originalEvents[0].tags.some(([k, delegatee]) => k == 'D' && delegatee == activeUser.pubkey);
-  const editMode = isMyDocument || isDelegatedToMe;
-
-  const [, delegatee] = originalEvents[0]?.tags.find(([k]) => k == 'D') || [];
 
   const {
-    events: delegateeEvents,
-    eose: delegateeEose,
-    isSubscribed: isDelegateeSubscribed,
-  } = useSubscribe({
-    filters: [{ kinds: [kind], '#d': [identifier], authors: [delegatee], limit: 1 }],
-    enabled: !!identifier && !!kind && !!delegatee,
-  });
-
-  const title = mostRecentEvent?.tagValue('title');
-  const content = mostRecentEvent?.content;
-
-  const handleSave = () => {
-    const markdown = markdownRef.current?.getMarkdown();
-
-    const e = createNewEvent();
-    e.kind = DOC_KIND;
-    e.content = markdown || '';
-    e.generateTags();
-    e.tags = [
-      ['title', titleInput],
-      ['d', mostRecentEvent?.dTag || ''],
-    ];
-
-    if (isMyDocument) {
-      e.tags.push(['D', delegateeState, activeUser.pubkey]); // delegatee, delegator
-    }
-
-    if (isDelegatedToMe) {
-      e.tags.push(['D', '', originalEvents[0]?.pubkey]); // delegatee, delegator
-    }
-
-    e.publish().then(() => {
-      toast({
-        title: 'Saved!',
-      });
-    });
-  };
+    content,
+    canEdit,
+    markdownRef,
+    delegateeUser,
+    lastEditor,
+    owner,
+    status,
+    title,
+    updateDocument,
+    isDelegatedToMe,
+    isMyDocument,
+    delegateePubkey,
+    setDelegateePubkey,
+    mostRecentEvent,
+  } = useDocument({ naddr });
 
   useEffect(() => {
     setTitleInput(title || '');
-    setDelegateeState(delegatee);
-    markdownRef.current?.setMarkdown(content || '');
-  }, [title, content, setTitleInput, delegatee, setDelegateeState]);
-
-  useEffect(() => {
-    if (originalEvents.length > 0) {
-      originalEvents[0].author.fetchProfile().then((profile) => {
-        setOwner(profile);
-      });
-    }
-  }, [originalEvents]);
-
-  useEffect(() => {
-    setMostRecentEvent((prev) => {
-      if (prev) {
-        if (delegateeEvents.length == 0) return prev;
-        if (!delegateeEvents[0].created_at) return prev;
-        if (!prev.created_at) return prev;
-
-        if (delegateeEvents[0].created_at < prev.created_at) {
-          return prev;
-        } else {
-          return delegateeEvents[0];
-        }
-      } else {
-        if (originalEvents.length == 0) return undefined;
-
-        return originalEvents[0];
-      }
-    });
-  }, [setMostRecentEvent, originalEvents, delegateeEvents]);
-
-  useEffect(() => {
-    if (mostRecentEvent) {
-      mostRecentEvent.author.fetchProfile().then((profile) => {
-        setLastEditor(profile);
-      });
-    }
-  }, [mostRecentEvent]);
-
-  useEffect(() => {
-    if (!!delegateeState) {
-      ndk
-        .getUser({ pubkey: delegateeState })
-        .fetchProfile({ groupable: false })
-        .then((profile) => {
-          setDelegateeUser(profile);
-        });
-    }
-  }, [ndk, delegateeState, setDelegateeUser]);
+  }, [title, setTitleInput]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        handleSave();
+        updateDocument(titleInput, markdownRef.current?.getMarkdown() || '');
       }
     };
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, [handleSave]);
+  }, [updateDocument, titleInput]);
 
-  if (!originalEose || (isDelegateeSubscribed && !delegateeEose && !delegateeEvents)) {
+  if (status == 'loading') {
     return (
       <div className="flex justify-center items-center h-full">
-        <Loader2 className="animate-spin w-16 h-16" />
+        <Loader2 className="mt-4 animate-spin w-10 h-10" />
       </div>
     );
   }
 
-  if (mostRecentEvent == undefined && originalEose) {
+  if (status == 'not-found') {
     return <p>No document found</p>;
   }
 
   return (
     <>
-      <div className="my-4 flex gap-4 items-center">
+      <div className="m-4 flex gap-2 items-center">
         <BackButton />
 
         <div>
@@ -184,8 +89,11 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
           </p>
         </div>
 
-        {editMode && (
-          <Button className="ml-auto flex items-center gap-4" onClick={() => handleSave()}>
+        {canEdit && (
+          <Button
+            className="ml-auto flex items-center gap-4"
+            onClick={() => updateDocument(titleInput, markdownRef.current?.getMarkdown() || '')}
+          >
             <span>Save</span>
 
             <kbd className="pointer-events-none inline-flex h-6 select-none items-center gap-1 rounded border bg-muted px-2 font-mono text-xs font-medium text-muted-foreground opacity-100">
@@ -195,67 +103,8 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
         )}
       </div>
 
-      <Card className="mb-8 pt-6">
-        <CardContent className="flex items-center gap-4">
-          <p className="text-muted-foreground flex items-center gap-2">
-            <span>Owner:</span>
-
-            <HoverCard>
-              <HoverCardTrigger className="cursor-pointer hover:underline">
-                {owner === undefined ? (
-                  <Skeleton className="w-16 h-4" />
-                ) : owner === null ? (
-                  originalEvents[0]?.pubkey.slice(0, 6) + '...'
-                ) : (
-                  owner.name
-                )}
-              </HoverCardTrigger>
-              <HoverCardContent className="flex items-center gap-4">
-                <Avatar>
-                  {owner?.image && (
-                    <AvatarImage src={owner?.image || ''} alt={owner?.name || 'avatar'} />
-                  )}
-                </Avatar>
-                <div>
-                  <h4>{owner?.name || 'Anonostrich'}</h4>
-                  <Muted>{owner?.nip05 || ''}</Muted>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
-          </p>
-          <p className="text-muted-foreground flex items-center gap-2">
-            <span>Last edit by:</span>
-
-            <HoverCard>
-              <HoverCardTrigger className="cursor-pointer hover:underline">
-                {lastEditor === undefined ? (
-                  <Skeleton className="w-16 h-4" />
-                ) : lastEditor === null ? (
-                  mostRecentEvent?.pubkey.slice(0, 6) + '...'
-                ) : (
-                  lastEditor.name
-                )}
-              </HoverCardTrigger>
-              <HoverCardContent className="flex items-center gap-4">
-                <Avatar>
-                  {lastEditor?.image && (
-                    <AvatarImage src={lastEditor?.image || ''} alt={lastEditor?.name || 'avatar'} />
-                  )}
-                </Avatar>
-                <div>
-                  <h4>{lastEditor?.name || 'Anonostrich'}</h4>
-                  <Muted>{lastEditor?.nip05 || ''}</Muted>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
-          </p>
-        </CardContent>
-      </Card>
-
-      {editMode && (
-        <div className="mb-8 flex flex-col sm:flex-row items-baseline gap-4">
-          <span className="text-xl font-semibold">Title:</span>
-
+      {canEdit && (
+        <div className="mb-4 mx-4">
           <Input
             autoFocus
             placeholder="Title"
@@ -266,19 +115,87 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
         </div>
       )}
 
-      <div className="border rounded-lg">
+      <Card className="m-4 p-4 flex flex-col gap-4 md:flex-row md:justify-between">
+        <div className="flex items-center gap-2">
+          <div className="flex group">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={loader(owner?.image || NOSTR_ICON_URL)} alt={owner?.displayName} />
+            </Avatar>
+            {delegateeUser && (
+              <Avatar className="-ml-2 w-8 h-8 group-hover:ml-0 transition-all">
+                <AvatarImage
+                  src={loader(delegateeUser.image || NOSTR_ICON_URL)}
+                  alt={delegateeUser.displayName}
+                />
+              </Avatar>
+            )}
+          </div>
+
+          <div className="max-w-80">
+            <p className="truncate">
+              {owner ? owner.displayName : mostRecentEvent?.author.npub || 'N/A'}
+            </p>
+
+            {delegateeUser && <p className="truncate">{delegateeUser.displayName}</p>}
+          </div>
+        </div>
+
+        {/* <div className="text-muted-foreground flex items-center gap-2">
+          <span>Owner:</span>
+
+          <HoverCard>
+            <HoverCardTrigger className="cursor-pointer hover:underline">
+              {owner === undefined ? (
+                <Skeleton className="w-16 h-4" />
+              ) : owner === null ? (
+                'N/A'
+              ) : (
+                owner.name
+              )}
+            </HoverCardTrigger>
+            <HoverCardContent className="flex items-center gap-4">
+              <Avatar>
+                {owner?.image && (
+                  <AvatarImage src={loader(owner?.image || '')} alt={owner?.name || 'avatar'} />
+                )}
+              </Avatar>
+              <div>
+                <h4>{owner?.name || 'N/A'}</h4>
+                <Muted>{owner?.nip05 || ''}</Muted>
+              </div>
+            </HoverCardContent>
+          </HoverCard>
+        </div> */}
+
+        <div className="flex items-center gap-2">
+          <Avatar className="w-8 h-8">
+            <AvatarImage
+              src={loader(lastEditor?.image || NOSTR_ICON_URL)}
+              alt={lastEditor?.displayName}
+            />
+          </Avatar>
+
+          <p className="font-light truncate">
+            {mostRecentEvent && mostRecentEvent.created_at
+              ? formatRelative(mostRecentEvent.created_at * 1000, new Date())
+              : 'N/A'}
+          </p>
+        </div>
+      </Card>
+
+      <div className="mx-4 border rounded-lg">
         <Markdown
           markdownRef={markdownRef}
-          markdown={content || ''}
-          readonly={!editMode}
-          hideToolbar={!editMode}
-          key={editMode ? 'edit' : 'view'}
+          content={content}
+          readonly={!canEdit}
+          hideToolbar={!canEdit}
+          key={canEdit ? 'edit' : 'view'}
         />
       </div>
 
       {isMyDocument ? (
-        delegateeState ? (
-          <div className="mt-8">
+        Boolean(delegateePubkey) ? (
+          <div className="mx-4 mt-8">
             <Card>
               <CardContent className="pt-5">
                 <p className="mb-2">
@@ -289,7 +206,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                       {delegateeUser === undefined ? (
                         <Skeleton className="w-16 h-4" />
                       ) : delegateeUser === null ? (
-                        delegateeState.slice(0, 6) + '...'
+                        delegateePubkey.slice(0, 6) + '...'
                       ) : (
                         delegateeUser.name
                       )}
@@ -298,7 +215,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                       <Avatar>
                         {delegateeUser?.image && (
                           <AvatarImage
-                            src={delegateeUser?.image || ''}
+                            src={loader(delegateeUser?.image || '')}
                             alt={delegateeUser?.name || 'avatar'}
                           />
                         )}
@@ -314,7 +231,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                   size="sm"
                   variant="destructive"
                   className="flex gap-1 items-center"
-                  onClick={() => setDelegateeState('')}
+                  onClick={() => setDelegateePubkey('')}
                 >
                   <span>Revoke access</span>
                   <Trash2Icon className="h-5 w-5" />
@@ -323,7 +240,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
             </Card>
           </div>
         ) : (
-          <div className="mt-8">
+          <div className="mx-4 mt-8">
             <Card>
               <CardContent className="pt-5">
                 <p className="mb-2">
@@ -333,7 +250,7 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
                 <p className="mb-2 text-muted-foreground">
                   Add a delegatee to allow someone else to edit this document.
                 </p>
-                <Delegatee setDelegateeState={setDelegateeState} />
+                <Delegatee setDelegateePubkey={setDelegateePubkey} />
               </CardContent>
             </Card>
           </div>
@@ -341,24 +258,10 @@ const View = ({ data }: { data: nip19.AddressPointer }) => {
       ) : null}
 
       {isDelegatedToMe && (
-        <div className="mt-4">
+        <div className="mx-4 mt-4">
           <Muted>This document is delegated to you by the owner</Muted>
         </div>
       )}
-    </>
-  );
-};
-
-export const DocPage = () => {
-  const { naddr } = useParams();
-
-  const { data, type } = nip19.decode(naddr || '');
-
-  if (type != 'naddr') return null;
-
-  return (
-    <>
-      <View data={data} key={data.identifier + data.kind + data.pubkey} />
     </>
   );
 };

@@ -71,10 +71,7 @@ export const Markdown = ({
       <MDXEditor
         ref={markdownRef}
         readOnly={readonly}
-        className={cn(
-          'absolute inset-0 scale-50 origin-top-left',
-          theme === 'dark' ? 'dark-theme dark-editor' : '',
-        )}
+        className={theme === 'dark' ? 'dark-theme dark-editor' : ''}
         markdown={content}
         plugins={hideToolbar ? plugins.rest(content) : [plugins.toolbar, ...plugins.rest(content)]}
       />

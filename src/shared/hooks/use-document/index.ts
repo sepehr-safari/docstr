@@ -31,6 +31,8 @@ export const useDocument = ({ naddr }: { naddr: string | undefined }) => {
   const [title, setTitle] = useState<string>('');
   const [content, setContent] = useState<string>('');
 
+  const [status, setStatus] = useState<'ok' | 'loading' | 'not-found'>('loading');
+
   const { createNewEvent } = useNewEvent();
   const { activeUser } = useActiveUser();
   const { ndk } = useNdk();
@@ -70,12 +72,6 @@ export const useDocument = ({ naddr }: { naddr: string | undefined }) => {
   });
 
   useEffect(() => {
-    if (originalEvents.length > 0) {
-      setMostRecentEvent(originalEvents[0]);
-    }
-  }, [originalEvents, setMostRecentEvent]);
-
-  useEffect(() => {
     if (originalEvents.length > 0 && activeUser) {
       setIsMyDocument(originalEvents[0].pubkey === activeUser.pubkey);
 
@@ -98,15 +94,21 @@ export const useDocument = ({ naddr }: { naddr: string | undefined }) => {
   }, [originalEvents, setDelegateePubkey]);
 
   useEffect(() => {
-    setMostRecentEvent((prev) => {
-      if (!prev) return;
-      if (!prev.created_at) return;
-      if (delegateeEvents.length == 0) return;
+    if (originalEvents.length == 0) return;
+    if (!originalEvents[0].created_at) return;
+
+    if (delegateeEvents.length > 0) {
       if (!delegateeEvents[0].created_at) return;
 
-      if (delegateeEvents[0].created_at > prev.created_at) return delegateeEvents[0];
-    });
-  }, [delegateeEvents, setMostRecentEvent]);
+      if (delegateeEvents[0].created_at > originalEvents[0].created_at) {
+        setMostRecentEvent(delegateeEvents[0]);
+      } else {
+        setMostRecentEvent(originalEvents[0]);
+      }
+    } else {
+      setMostRecentEvent(originalEvents[0]);
+    }
+  }, [originalEvents, delegateeEvents, setMostRecentEvent]);
 
   useEffect(() => {
     if (!mostRecentEvent) return;
@@ -145,6 +147,27 @@ export const useDocument = ({ naddr }: { naddr: string | undefined }) => {
   useEffect(() => {
     markdownRef.current?.setMarkdown(content || '');
   }, [content]);
+
+  useEffect(() => {
+    setStatus(() => {
+      if (originalEose && !mostRecentEvent) {
+        return 'not-found';
+      }
+
+      if (!originalEose || (isDelegateeSubscribed && !delegateeEose && !delegateeEvents)) {
+        return 'loading';
+      }
+
+      return 'ok';
+    });
+  }, [
+    originalEose,
+    isDelegateeSubscribed,
+    delegateeEose,
+    delegateeEvents,
+    mostRecentEvent,
+    setStatus,
+  ]);
 
   const updateDocument = (title: string, content: string) => {
     if (!mostRecentEvent) return;
@@ -187,10 +210,7 @@ export const useDocument = ({ naddr }: { naddr: string | undefined }) => {
     isDelegatedToMe,
     delegateePubkey,
     setDelegateePubkey,
-    status: (!originalEose || (isDelegateeSubscribed && !delegateeEose && !delegateeEvents)
-      ? 'loading'
-      : mostRecentEvent == undefined && originalEose
-        ? 'not-found'
-        : 'ok') as 'ok' | 'loading' | 'not-found',
+    mostRecentEvent,
+    status,
   };
 };

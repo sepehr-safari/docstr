@@ -1,4 +1,5 @@
 import { NDKEvent, NDKKind } from '@nostr-dev-kit/ndk';
+import { formatRelative } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import { useSubscribe } from 'nostr-hooks';
 import { useState } from 'react';
@@ -20,15 +21,25 @@ import { Preview } from '@/features/preview';
 const LocalPreview = ({ event }: { event: NDKEvent }) => {
   const naddr = event.encode();
 
-  const { content, title, owner, delegateeUser } = useDocument({ naddr });
+  const { content, title, owner, delegateeUser, mostRecentEvent } = useDocument({ naddr });
 
   return (
     <Link to={`/doc/${naddr}`}>
       <Preview
         content={content}
+        footerHeightFactor={0.4}
         footer={
           <>
-            <p className="text-sm font-semibold truncate">{title}</p>
+            <div>
+              <p className="text-sm font-semibold truncate">{title}</p>
+
+              <p className="text-xs font-extralight">
+                {mostRecentEvent && mostRecentEvent.created_at
+                  ? formatRelative(mostRecentEvent.created_at * 1000, new Date())
+                  : 'N/A'}
+              </p>
+            </div>
+
             <div className="flex items-center gap-2">
               <div className="flex group">
                 <Avatar className="w-7 h-7">
@@ -37,8 +48,9 @@ const LocalPreview = ({ event }: { event: NDKEvent }) => {
                     alt={owner?.displayName}
                   />
                 </Avatar>
+
                 {delegateeUser && (
-                  <Avatar className="-ml-2 w-7 h-7 group-hover:ml-0 transition-all">
+                  <Avatar className="-ml-2 w-7 h-7 transition-all group-hover:ml-0">
                     <AvatarImage
                       src={loader(delegateeUser.image || NOSTR_ICON_URL)}
                       alt={delegateeUser.displayName}
@@ -46,12 +58,14 @@ const LocalPreview = ({ event }: { event: NDKEvent }) => {
                   </Avatar>
                 )}
               </div>
+
               <div className="w-1/2">
-                <p className="text-xs font-extralight truncate">
+                <p className="text-xs font-light truncate">
                   {owner ? owner.displayName : event.author.npub}
                 </p>
+
                 {delegateeUser && (
-                  <p className="text-xs font-extralight truncate">{delegateeUser.displayName}</p>
+                  <p className="text-xs font-light truncate">{delegateeUser.displayName}</p>
                 )}
               </div>
             </div>

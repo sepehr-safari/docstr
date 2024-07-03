@@ -5,6 +5,9 @@ import { useActiveUser, useNdk, useNewEvent, useNip07 } from 'nostr-hooks';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { DOC_KIND } from '@/shared/config';
+import { loader } from '@/shared/utils';
+
 import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import { Card, CardContent } from '@/shared/components/ui/card';
@@ -17,8 +20,6 @@ import { useToast } from '@/shared/components/ui/use-toast';
 import { BackButton } from '@/features/back-button';
 import { Delegatee } from '@/features/delegatee';
 import { Markdown } from '@/features/markdown';
-
-import { DOC_KIND } from '@/shared/config';
 
 export const NewPage = () => {
   const [titleInput, setTitleInput] = useState('');
@@ -121,7 +122,7 @@ export const NewPage = () => {
                 <Avatar>
                   {activeUser?.profile?.image && (
                     <AvatarImage
-                      src={activeUser?.profile.image || ''}
+                      src={loader(activeUser?.profile.image || '')}
                       alt={activeUser?.profile.name || 'avatar'}
                     />
                   )}
@@ -149,7 +150,7 @@ export const NewPage = () => {
       </div>
 
       <div className="border rounded-lg">
-        <Markdown markdownRef={markdownRef} />
+        <Markdown content="" markdownRef={markdownRef} />
       </div>
 
       {delegateeState ? (
@@ -173,7 +174,7 @@ export const NewPage = () => {
                     <Avatar>
                       {delegateeUser?.image && (
                         <AvatarImage
-                          src={delegateeUser?.image || ''}
+                          src={loader(delegateeUser?.image || '')}
                           alt={delegateeUser?.name || 'avatar'}
                         />
                       )}

@@ -2,10 +2,11 @@ import { NDKEvent, NDKUserProfile } from '@nostr-dev-kit/ndk';
 import { useNdk, useSubscribe } from 'nostr-hooks';
 import { useEffect, useState } from 'react';
 
+import { DOC_KIND } from '@/shared/config';
+import { loader } from '@/shared/utils';
+
 import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
 import { Skeleton } from '@/shared/components/ui/skeleton';
-
-import { DOC_KIND } from '@/shared/config';
 
 export const DocListItem = ({ originalEvent }: { originalEvent: NDKEvent }) => {
   const [owner, setOwner] = useState<NDKUserProfile | null>();
@@ -72,10 +73,10 @@ export const DocListItem = ({ originalEvent }: { originalEvent: NDKEvent }) => {
         <div className="flex items-center">
           <Avatar className="w-8 h-8 rounded-full">
             <AvatarImage
-              src={
+              src={loader(
                 owner?.image ||
-                'https://primal.b-cdn.net/media-cache?s=m&a=1&u=https%3A%2F%2Fraw.githubusercontent.com%2Fsepehr-safari%2Fnostribe-web-client%2Fmain%2Fpublic%2Fnostribe.png'
-              }
+                  'https://primal.b-cdn.net/media-cache?s=m&a=1&u=https%3A%2F%2Fraw.githubusercontent.com%2Fsepehr-safari%2Fnostribe-web-client%2Fmain%2Fpublic%2Fnostribe.png',
+              )}
               alt={owner?.name || 'avatar'}
             />
           </Avatar>
@@ -88,10 +89,10 @@ export const DocListItem = ({ originalEvent }: { originalEvent: NDKEvent }) => {
         <div className="flex items-center">
           <Avatar className="w-8 h-8 rounded-full">
             <AvatarImage
-              src={
+              src={loader(
                 delegateeUser?.image ||
-                'https://primal.b-cdn.net/media-cache?s=m&a=1&u=https%3A%2F%2Fraw.githubusercontent.com%2Fsepehr-safari%2Fnostribe-web-client%2Fmain%2Fpublic%2Fnostribe.png'
-              }
+                  'https://primal.b-cdn.net/media-cache?s=m&a=1&u=https%3A%2F%2Fraw.githubusercontent.com%2Fsepehr-safari%2Fnostribe-web-client%2Fmain%2Fpublic%2Fnostribe.png',
+              )}
               alt={delegateeUser?.name || 'avatar'}
             />
           </Avatar>

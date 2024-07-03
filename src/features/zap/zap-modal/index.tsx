@@ -1,5 +1,7 @@
 import { Loader2 } from 'lucide-react';
 
+import { loader } from '@/shared/utils';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -44,7 +46,7 @@ export const ZapModal = ({
         <DialogHeader>
           <DialogTitle className="flex gap-4 items-center">
             <Avatar>
-              <AvatarImage src={image} />
+              <AvatarImage src={loader(image || '')} />
               <AvatarFallback>{name?.[0]}</AvatarFallback>
             </Avatar>
 

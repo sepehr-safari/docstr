@@ -23,7 +23,7 @@ import { Markdown } from '@/features/markdown';
 
 export const NewPage = () => {
   const [titleInput, setTitleInput] = useState('');
-  const [delegateeState, setDelegateeState] = useState('');
+  const [delegateePubkey, setDelegateePubkey] = useState('');
   const [delegateeUser, setDelegateeUser] = useState<NDKUserProfile | null>();
   const markdownRef = useRef<MDXEditorMethods>(null);
 
@@ -54,7 +54,7 @@ export const NewPage = () => {
     e.content = markdown || '';
     e.tags = [
       ['title', titleInput],
-      ['D', delegateeState, activeUser.pubkey],
+      ['D', delegateePubkey, activeUser.pubkey],
     ];
     e.generateTags();
     e.publish().then(() => {
@@ -63,15 +63,15 @@ export const NewPage = () => {
   };
 
   useEffect(() => {
-    if (!!delegateeState) {
+    if (!!delegateePubkey) {
       ndk
-        .getUser({ pubkey: delegateeState })
+        .getUser({ pubkey: delegateePubkey })
         .fetchProfile({ groupable: false })
         .then((profile) => {
           setDelegateeUser(profile);
         });
     }
-  }, [ndk, delegateeState, setDelegateeUser]);
+  }, [ndk, delegateePubkey, setDelegateeUser]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -87,7 +87,7 @@ export const NewPage = () => {
 
   return (
     <>
-      <div className="mb-4 flex gap-4 items-center">
+      <div className="m-4 flex gap-2 items-center">
         <BackButton />
 
         <div>
@@ -98,48 +98,12 @@ export const NewPage = () => {
           <span>Publish</span>
 
           <kbd className="pointer-events-none inline-flex h-6 select-none items-center gap-1 rounded border bg-muted px-2 font-mono text-xs font-medium text-muted-foreground opacity-100">
-            <span className="text-lg">⌘</span>P
+            <span className="text-lg">⌘</span>S
           </kbd>
         </Button>
       </div>
 
-      <Card className="mb-8 pt-6">
-        <CardContent className="flex items-center gap-4">
-          <p className="text-muted-foreground flex items-center gap-2">
-            <span>Owner:</span>
-
-            <HoverCard>
-              <HoverCardTrigger className="cursor-pointer hover:underline">
-                {!activeUser ? (
-                  <Skeleton className="w-16 h-4" />
-                ) : !activeUser.profile ? (
-                  activeUser.pubkey.slice(0, 6) + '...'
-                ) : (
-                  activeUser.profile.name
-                )}
-              </HoverCardTrigger>
-              <HoverCardContent className="flex items-center gap-4">
-                <Avatar>
-                  {activeUser?.profile?.image && (
-                    <AvatarImage
-                      src={loader(activeUser?.profile.image || '')}
-                      alt={activeUser?.profile.name || 'avatar'}
-                    />
-                  )}
-                </Avatar>
-                <div>
-                  <h4>{activeUser?.profile?.name || 'Anonostrich'}</h4>
-                  <Muted>{activeUser?.profile?.nip05 || ''}</Muted>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
-          </p>
-        </CardContent>
-      </Card>
-
-      <div className="mb-8 flex flex-col sm:flex-row items-baseline gap-4">
-        <span className="text-xl font-semibold">Title:</span>
-
+      <div className="mb-4 mx-4">
         <Input
           autoFocus
           placeholder="Title"
@@ -149,12 +113,12 @@ export const NewPage = () => {
         />
       </div>
 
-      <div className="border rounded-lg">
-        <Markdown content="" markdownRef={markdownRef} />
+      <div className="mx-4 border rounded-lg">
+        <Markdown markdownRef={markdownRef} content="" />
       </div>
 
-      {delegateeState ? (
-        <div className="mt-8">
+      {Boolean(delegateePubkey) ? (
+        <div className="mx-4 mt-8">
           <Card>
             <CardContent className="pt-5">
               <p className="mb-2">
@@ -165,7 +129,7 @@ export const NewPage = () => {
                     {delegateeUser === undefined ? (
                       <Skeleton className="w-16 h-4" />
                     ) : delegateeUser === null ? (
-                      delegateeState.slice(0, 6) + '...'
+                      delegateePubkey.slice(0, 6) + '...'
                     ) : (
                       delegateeUser.name
                     )}
@@ -190,7 +154,7 @@ export const NewPage = () => {
                 size="sm"
                 variant="destructive"
                 className="flex gap-1 items-center"
-                onClick={() => setDelegateeState('')}
+                onClick={() => setDelegateePubkey('')}
               >
                 <span>Revoke access</span>
                 <Trash2Icon className="h-5 w-5" />
@@ -199,7 +163,7 @@ export const NewPage = () => {
           </Card>
         </div>
       ) : (
-        <div className="mt-8">
+        <div className="mx-4 mt-8">
           <Card>
             <CardContent className="pt-5">
               <p className="mb-2">
@@ -209,7 +173,7 @@ export const NewPage = () => {
               <p className="mb-2 text-muted-foreground">
                 Add a delegatee to allow someone else to edit this document.
               </p>
-              <Delegatee setDelegateeState={setDelegateeState} />
+              <Delegatee setDelegateePubkey={setDelegateePubkey} />
             </CardContent>
           </Card>
         </div>

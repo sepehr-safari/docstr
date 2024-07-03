@@ -20,6 +20,8 @@ import {
 } from '@mdxeditor/editor';
 import { RefObject } from 'react';
 
+import { cn } from '@/shared/utils';
+
 import { useTheme } from '@/shared/components/theme-provider';
 
 import '@mdxeditor/editor/style.css';
@@ -53,12 +55,12 @@ const plugins = {
 
 export const Markdown = ({
   markdownRef,
-  markdown = '',
+  content,
   readonly = false,
   hideToolbar = false,
 }: {
   markdownRef: RefObject<MDXEditorMethods>;
-  markdown?: string;
+  content: string;
   readonly?: boolean;
   hideToolbar?: boolean;
 }) => {
@@ -69,11 +71,12 @@ export const Markdown = ({
       <MDXEditor
         ref={markdownRef}
         readOnly={readonly}
-        className={theme === 'dark' ? 'dark-theme dark-editor' : ''}
-        markdown={markdown}
-        plugins={
-          hideToolbar ? plugins.rest(markdown) : [plugins.toolbar, ...plugins.rest(markdown)]
-        }
+        className={cn(
+          'absolute inset-0 scale-50 origin-top-left',
+          theme === 'dark' ? 'dark-theme dark-editor' : '',
+        )}
+        markdown={content}
+        plugins={hideToolbar ? plugins.rest(content) : [plugins.toolbar, ...plugins.rest(content)]}
       />
     </>
   );

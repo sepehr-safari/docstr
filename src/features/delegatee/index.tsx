@@ -76,14 +76,14 @@ const SearchResults = ({
 };
 
 export const Delegatee = ({
-  setDelegateeState,
+  setDelegateePubkey,
 }: {
-  setDelegateeState: (delegateeState: string) => void;
+  setDelegateePubkey: (delegateePubkey: string) => void;
 }) => {
   const [search, setSearch] = useState('');
 
   const handleSelect = (pubkey: string) => {
-    setDelegateeState(pubkey);
+    setDelegateePubkey(pubkey);
   };
 
   return (

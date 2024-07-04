@@ -21,7 +21,9 @@ const displayCountBasedOnWidth = (width: number | null) => {
 
 export const TemplateGallery = () => {
   const [state, setState] = useState(false);
-  const [contents, setContents] = useState<string[]>([]);
+  const [templates, setTemplates] = useState<
+    { id: number; content: string; title: string; url: string }[]
+  >([]);
 
   const { width } = useWindowSize();
 
@@ -30,10 +32,21 @@ export const TemplateGallery = () => {
       fetch(template.url)
         .then((res) => res.text())
         .then((data) => {
-          setContents((prev) => [...prev, data]);
+          setTemplates((prev) => {
+            const foundIndex = prev.findIndex((t) => t.id === template.id);
+            if (foundIndex === -1) {
+              return [
+                ...prev,
+                { id: template.id, content: data, title: template.title, url: template.url },
+              ];
+            } else {
+              prev[foundIndex] = { ...prev[foundIndex], content: data };
+              return prev;
+            }
+          });
         });
     });
-  }, [setContents]);
+  }, [setTemplates]);
 
   return (
     <div className="bg-secondary">
@@ -55,12 +68,13 @@ export const TemplateGallery = () => {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {TEMPLATES.slice(0, state ? TEMPLATES.length : displayCountBasedOnWidth(width)).map(
-            (template, index) => (
-              <Link to={`/new?t=${index}`} key={index}>
+          {templates
+            .slice(0, state ? templates.length : displayCountBasedOnWidth(width))
+            .map((template) => (
+              <Link to={`/new?t=${template.id}`} key={template.id}>
                 <Preview
                   footerHeightFactor={0.2}
-                  content={contents[index]}
+                  content={template.content}
                   footer={
                     <>
                       <p className="text-sm font-semibold truncate">{template.title}</p>
@@ -68,8 +82,7 @@ export const TemplateGallery = () => {
                   }
                 />
               </Link>
-            ),
-          )}
+            ))}
         </div>
       </div>
     </div>

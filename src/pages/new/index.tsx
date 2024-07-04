@@ -3,9 +3,9 @@ import { NDKUserProfile } from '@nostr-dev-kit/ndk';
 import { Trash2Icon } from 'lucide-react';
 import { useActiveUser, useNdk, useNewEvent, useNip07 } from 'nostr-hooks';
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { DOC_KIND } from '@/shared/config';
+import { DOC_KIND, TEMPLATES } from '@/shared/config';
 import { loader } from '@/shared/utils';
 
 import { Avatar, AvatarImage } from '@/shared/components/ui/avatar';
@@ -35,6 +35,7 @@ export const NewPage = () => {
   const { toast } = useToast();
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handlePublish = () => {
     if (!activeUser) {
@@ -84,6 +85,20 @@ export const NewPage = () => {
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
   }, [handlePublish]);
+
+  useEffect(() => {
+    if (searchParams) {
+      const template = TEMPLATES[parseInt(searchParams.get('t') || '0')];
+      console.log(template);
+      if (template) {
+        fetch(template.url)
+          .then((res) => res.text())
+          .then((text) => {
+            markdownRef.current?.setMarkdown(text);
+          });
+      }
+    }
+  }, [searchParams]);
 
   return (
     <>

@@ -69,6 +69,7 @@ export const TemplateGallery = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {templates
+            .sort((a, b) => a.id - b.id)
             .slice(0, state ? templates.length : displayCountBasedOnWidth(width))
             .map((template) => (
               <Link to={`/new?t=${template.id}`} key={template.id}>

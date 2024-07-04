@@ -1,12 +1,12 @@
 import { useNostrHooks } from 'nostr-hooks';
 import { RouterProvider } from 'react-router-dom';
 
-import './index.css';
+import { ThemeProvider } from '@/shared/components/theme-provider';
+import { Toaster } from '@/shared/components/ui/toaster';
 
 import { router } from './router';
 
-import { ThemeProvider } from '@/shared/components/theme-provider';
-import { Toaster } from '@/shared/components/ui/toaster';
+import './index.css';
 
 export const App = () => {
   useNostrHooks();

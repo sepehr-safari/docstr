@@ -17,6 +17,7 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
+  linkPlugin,
 } from '@mdxeditor/editor';
 import { RefObject } from 'react';
 
@@ -42,6 +43,7 @@ const plugins = {
     headingsPlugin(),
     tablePlugin(),
     thematicBreakPlugin(),
+    linkPlugin(),
     codeBlockPlugin(),
     codeMirrorPlugin({
       codeBlockLanguages: { js: 'JavaScript', py: 'Python', ts: 'TypeScript', txt: 'text' },

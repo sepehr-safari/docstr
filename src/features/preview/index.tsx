@@ -47,7 +47,7 @@ export const Preview = ({ content, footer, footerHeightFactor = 0.3 }: Props) =>
 
         {footer && (
           <div
-            className="absolute bottom-0 left-0 right-0 px-4 py-2 border-t flex flex-col justify-around"
+            className="bg-background absolute bottom-0 left-0 right-0 px-4 py-2 border-t flex flex-col justify-around"
             style={{ height: PAPER_HEIGHT * footerHeightFactor * scale }}
           >
             {footer}

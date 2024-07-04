@@ -39,7 +39,7 @@ const plugins = {
   rest: (diffMarkdown: string) => [
     listsPlugin(),
     quotePlugin(),
-    headingsPlugin({ allowedHeadingLevels: [1, 2, 3, 4] }),
+    headingsPlugin(),
     tablePlugin(),
     thematicBreakPlugin(),
     codeBlockPlugin(),

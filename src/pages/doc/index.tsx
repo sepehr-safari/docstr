@@ -194,10 +194,14 @@ export const DocPage = () => {
       </div>
 
       {isMyDocument ? (
-        Boolean(delegateePubkey) ? (
-          <div className="mx-4 mt-8">
+        !!delegateePubkey ? (
+          <div className="mx-4 mt-4">
             <Card>
               <CardContent className="pt-5">
+                <p className="mb-2">
+                  <span className="text-muted-foreground">Who can see this document?{` `}</span>
+                  <span className="font-semibold">Anyone!</span>
+                </p>
                 <p className="mb-2">
                   <span className="text-muted-foreground">Who can edit this document?{` `}</span>
                   <span className="font-semibold">Me and </span>
@@ -221,7 +225,7 @@ export const DocPage = () => {
                         )}
                       </Avatar>
                       <div>
-                        <h4>{delegateeUser?.name || 'Anonostrich'}</h4>
+                        <h4>{delegateeUser?.name || 'Anon'}</h4>
                         <Muted>{delegateeUser?.nip05 || ''}</Muted>
                       </div>
                     </HoverCardContent>
@@ -240,9 +244,13 @@ export const DocPage = () => {
             </Card>
           </div>
         ) : (
-          <div className="mx-4 mt-8">
+          <div className="mx-4 mt-4">
             <Card>
               <CardContent className="pt-5">
+                <p className="mb-2">
+                  <span className="text-muted-foreground">Who can see this document?{` `}</span>
+                  <span className="font-semibold">Anyone!</span>
+                </p>
                 <p className="mb-2">
                   <span className="text-muted-foreground">Who can edit this document?{` `}</span>
                   <span className="font-semibold">Only me!</span>

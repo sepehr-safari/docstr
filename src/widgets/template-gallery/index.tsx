@@ -21,7 +21,7 @@ const displayCountBasedOnWidth = (width: number | null) => {
 
 export const TemplateGallery = () => {
   const [state, setState] = useState(false);
-  const [contents, setContents] = useState<string[]>(['']);
+  const [contents, setContents] = useState<string[]>([]);
 
   const { width } = useWindowSize();
 
@@ -57,7 +57,7 @@ export const TemplateGallery = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {TEMPLATES.slice(0, state ? TEMPLATES.length : displayCountBasedOnWidth(width)).map(
             (template, index) => (
-              <Link to={`/new?t=${index}`} key={template.title}>
+              <Link to={`/new?t=${index}`} key={index}>
                 <Preview
                   footerHeightFactor={0.2}
                   content={contents[index]}
